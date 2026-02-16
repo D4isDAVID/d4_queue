@@ -53,7 +53,7 @@ Convars = {
     maxClients = createConvarHandler(
         'sv_maxClients',
         30,
-        -- TODO: GetConvarInt
+        -- GetConvarInt
         function(n, d)
             return GetConvarInt(n, d) - 1
         end

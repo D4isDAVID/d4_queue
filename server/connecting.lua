@@ -14,15 +14,8 @@ AddEventHandler('playerConnecting', function(_, _, deferrals)
 
     if Utils.getEmptyPlayerSlots() > 0 then
         deferrals.done()
+        return
     end
 
     API.queue.add(source, deferrals)
-end)
-
-AddEventHandler('playerJoining', function()
-    API.queue.remove(source)
-end)
-
-AddEventHandler('playerDropped', function()
-    print('drop btw')
 end)
