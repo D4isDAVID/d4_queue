@@ -9,18 +9,50 @@ local waitThreadRunning = false
 ---@field deferrals Deferrals
 ---@field position integer
 ---@field waitingSeconds integer
+---@field points integer
 
 ---@type table<integer, PlayerQueueData>
 local positionToData = {}
 local queueSize = 0
+
+---@class MoveInternalOptions
+---@field position integer
+---@field moveBy integer
+
+---@param options MoveInternalOptions
+local function move(options)
+    for i = options.position, queueSize do
+        local data = positionToData[i]
+        positionToData[i] = nil
+
+        data.position += options.moveBy
+        positionToData[data.position] = data
+    end
+end
 
 ---@param player unknown
 ---@param deferrals Deferrals
 function API.queue.add(player, deferrals)
     player = tostring(player)
 
+    local points = API.points.calculate(player)
+    local position = queueSize + 1
+
+    for i = queueSize, 1, -1 do
+        local data = positionToData[i]
+
+        if data.points >= points then
+            break
+        end
+
+        position = data.position
+    end
+
+    move({
+        position = position,
+        moveBy = 1,
+    })
     queueSize += 1
-    local position = queueSize
 
     local data = {
         player = player,
@@ -28,11 +60,12 @@ function API.queue.add(player, deferrals)
         deferrals = deferrals,
         position = position,
         waitingSeconds = 0,
+        points = points,
     }
 
     positionToData[position] = data
 
-    print(('%s has joined the queue'):format(data.name))
+    print(('%s has joined the queue with %d points'):format(data.name, points))
 
     if waitThreadRunning then
         return
@@ -75,13 +108,10 @@ local function remove(options)
         end
     end
 
-    for i = startPosition + removeCount, queueSize do
-        local data = positionToData[i]
-        positionToData[i] = nil
-
-        data.position -= removeCount
-        positionToData[data.position] = data
-    end
+    move({
+        position = startPosition + removeCount,
+        moveBy = -removeCount,
+    })
 
     queueSize -= removeCount
 end
@@ -94,6 +124,7 @@ function API.queue.wait()
 
     local message = Convars.deferralMessage()
     local waitingEmoji = Utils.getWaitingEmoji()
+    local points = Convars.priorityPointsPerSecond()
 
     local emptySlots = Utils.getEmptyPlayerSlots()
     if emptySlots > 0 then
@@ -117,10 +148,12 @@ function API.queue.wait()
                 queue_size = queueSize,
                 waiting_time = Utils.createDisplayTime(data.waitingSeconds),
                 waiting_emoji = waitingEmoji,
+                points = data.points,
             })
 
             data.deferrals.update(formatted)
             data.waitingSeconds += 1
+            data.points += points
         else
             disconnected[#disconnected + 1] = data.position
         end
