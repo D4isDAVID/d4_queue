@@ -31,43 +31,34 @@ local function createConvarHandler(name, default, func)
 end
 
 Convars = {
-    ---@return string[]
     waitingEmoji = createConvarHandler(
         'd4_queue:waitingEmoji',
-        { '🕛', '🕒', '🕕', '🕘' },
+        { '🕛', '🕒', '🕕', '🕘' } --[[@as string[] ]],
         getConvarTable
     ),
-    ---@return string
     deferralMessage = createConvarHandler(
         'd4_queue:deferralMessage',
         '🐌 You are {queue_position}/{queue_size} in queue. {waiting_time} {waiting_emoji} ({points} points)',
         GetConvar
     ),
-    ---@return string[]
     startingPriorityPoints = createConvarHandler(
         'd4_queue:startingPriorityPoints',
-        {},
+        {} --[[@as table<string, integer>]],
         getConvarTable
     ),
-    ---@return string[]
     priorityPointsPerSecond = createConvarHandler(
         'd4_queue:priorityPointsPerSecond',
         1,
         GetConvarInt
     ),
-    ---@return boolean
     disableHardcap = createConvarHandler(
         'd4_queue:disableHardcap',
         true,
         GetConvarBool
     ),
-    ---@return integer
     maxClients = createConvarHandler(
         'sv_maxClients',
         30,
-        -- GetConvarInt
-        function(n, d)
-            return GetConvarInt(n, d) - 1
-        end
+        GetConvarInt
     ),
 }
