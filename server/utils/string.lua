@@ -1,4 +1,5 @@
 ---@param waitingSeconds number
+---@return string
 function Utils.createDisplayTime(waitingSeconds)
     local minutes = math.floor(waitingSeconds / 60)
     local seconds = waitingSeconds % 60

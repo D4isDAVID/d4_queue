@@ -1,4 +1,4 @@
-local TICK = 0
+local TICK <const> = 0
 
 ---@class Deferrals
 ---@field defer fun()

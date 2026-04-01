@@ -1,6 +1,6 @@
 API.queue = {}
 
-local SECOND = 1000
+local SECOND <const> = 1000
 local waitThreadRunning = false
 
 ---@class PlayerQueueData

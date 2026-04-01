@@ -1,4 +1,4 @@
-local HARDCAP = 'hardcap'
+local HARDCAP <const> = 'hardcap'
 local stopping = ('Stopping %s'):format(HARDCAP)
 local preventing = ('Preventing %s from starting'):format(HARDCAP)
 
