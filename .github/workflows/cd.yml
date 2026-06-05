@@ -16,7 +16,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          path: d4_queue
           sparse-checkout: |
             docs
             server
@@ -31,11 +30,11 @@ jobs:
       - name: Archive
         shell: bash
         run: |
-          rm -rf ./d4_queue/.git
-          zip -r d4_queue.zip ./d4_queue/
+          rm -rf .git
+          zip -r d4_queue.zip .
 
       - name: Draft release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
