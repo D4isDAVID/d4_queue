@@ -16,16 +16,28 @@ local positionToData = {}
 local queueSize = 0
 
 ---@class MoveInternalOptions
----@field position integer
----@field moveBy integer
+---@field from integer
+---@field by integer
 
 ---@param options MoveInternalOptions
 local function move(options)
-    for i = options.position, queueSize do
+    local moveBy = options.by
+
+    if moveBy == 0 then
+        return
+    end
+
+    local fromPosition = options.from
+
+    local step = moveBy < 0 and 1 or -1
+    local from = step < 0 and fromPosition or queueSize
+    local to = step < 0 and queueSize or fromPosition
+
+    for i = from, to, step do
         local data = positionToData[i]
         positionToData[i] = nil
 
-        data.position += options.moveBy
+        data.position += moveBy
         positionToData[data.position] = data
     end
 end
@@ -49,8 +61,8 @@ function API.queue.add(player, deferrals)
     end
 
     move({
-        position = position,
-        moveBy = 1,
+        from = position,
+        by = 1,
     })
     queueSize += 1
 
@@ -86,34 +98,38 @@ function API.queue.add(player, deferrals)
 end
 
 ---@class RemoveInternalOptions
----@field startPosition integer
----@field removeCount integer?
----@field afterRemoving fun(data: PlayerQueueData)?
+---@field from integer
+---@field count integer?
+---@field after fun(data: PlayerQueueData)?
 
 ---@param options RemoveInternalOptions
 local function remove(options)
-    local startPosition = options.startPosition
-    local removeCount = options.removeCount or 1
-    local afterRemoving = options.afterRemoving
+    local count = options.count or 1
 
-    local endPosition = math.min(startPosition + removeCount - 1, queueSize)
+    if count == 0 then
+        return
+    end
 
-    for i = startPosition, endPosition do
+    local from = options.from
+    local to = math.min(from + count - 1, queueSize)
+    local after = options.after
+
+    for i = from, to do
         local data = positionToData[i]
         positionToData[i] = nil
         data.deferrals.done()
 
-        if afterRemoving ~= nil then
-            afterRemoving(data)
+        if after ~= nil then
+            after(data)
         end
     end
 
     move({
-        position = startPosition + removeCount,
-        moveBy = -removeCount,
+        from = from + count,
+        by = -count,
     })
 
-    queueSize -= removeCount
+    queueSize -= count
 end
 
 ---@return boolean waiting
@@ -129,9 +145,9 @@ function API.queue.wait()
     local emptySlots = Utils.getEmptyPlayerSlots()
     if emptySlots > 0 then
         remove({
-            startPosition = 1,
-            removeCount = emptySlots,
-            afterRemoving = function(data)
+            from = 1,
+            count = emptySlots,
+            after = function(data)
                 print(('%s has passed the queue'):format(data.name))
             end,
         })
@@ -161,8 +177,8 @@ function API.queue.wait()
 
     for i = 1, #disconnected do
         remove({
-            startPosition = disconnected[i],
-            afterRemoving = function(data)
+            from = disconnected[i],
+            after = function(data)
                 print(('%s has left the queue'):format(data.name))
             end,
         })
