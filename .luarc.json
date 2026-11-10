@@ -51,7 +51,10 @@
           "param": ["_"]
         }
       ],
-      "function_name_style": "camel_case",
+      "function_name_style": [
+        "camel_case",
+        "pascal_case"
+      ],
       "local_function_name_style": "camel_case",
       "table_field_name_style": "camel_case",
       "global_variable_name_style": "pascal_case",
@@ -77,6 +80,7 @@
       "|=",
       "^="
     ],
+    "plugin": "${env:CFX_LUALS_ADDON}/plugin.lua",
     "version": "Lua 5.4"
   },
   "type": {
@@ -85,5 +89,18 @@
     "inferParamType": false,
     "weakNilCheck": false,
     "weakUnionCheck": false
+  },
+  "workspace": {
+    "ignoreDir": [
+      ".git",
+      ".github",
+      ".vscode",
+      ".zed",
+      "docs",
+      "fivem-lls-addon"
+    ],
+    "library": [
+      "${env:CFX_LUALS_ADDON}/library"
+    ]
   }
 }

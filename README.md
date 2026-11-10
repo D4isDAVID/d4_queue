@@ -37,6 +37,6 @@ This project's source code © 2026 David Malchin is licensed under the
 [discord server]: https://discord.gg/rdjpS2K8hC
 [user guide]: ./docs/user-guide.md
 [`docs/`]: ./docs/README.md
-[security policy]: https://github.com/D4isDAVID/d4_queue/security/policy
+[security policy]: ./SECURITY.md
 [contributing guidelines]: ./CONTRIBUTING.md
 [license]: ./LICENSE
